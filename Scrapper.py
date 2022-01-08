@@ -5,7 +5,6 @@ class Scrapper:
     def __init__(self, date) -> None:
         self.url = f"https://www.billboard.com/charts/hot-100/{date}"
         self.soup = BeautifulSoup(self.get_html(), "html.parser")
-        self.song_list = self.scrape()
     
     def get_html(self):
         response = requests.get(self.url)
