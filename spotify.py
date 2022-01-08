@@ -4,18 +4,21 @@ from spotipy.oauth2 import SpotifyOAuth
 
 class Spotify:
     def __init__(self) -> None:
-        self.client_id = "spotify client id"
-        self.client_secret = "spotify client token"
+        self.client_id = "Spotify client id"
+        self.client_secret = "Spotify client secret"
         self.redirect_uri = "https://www.mysite.com"
-        sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=self.client_id,
+        try:
+            self.sp = self.authenticate_user()
+            self.user_id = self.get_user_id()
+        except Exception as e:
+            raise e
+        
+        
+    def authenticate_user(self):
+        return spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=self.client_id,
                                                        client_secret=self.client_secret,
                                                        redirect_uri=self.redirect_uri,
-                                                       scope="user-library-read"))
-        
-        # results = sp.current_user_saved_tracks()
-        # for idx, item in enumerate(results['items']):
-        #     track = item['track']
-        #     print(idx, track['artists'][0]['name'], " - ", track['name'])
-        
-        result = sp.current_user()
-        print(result)
+                                                       scope="user-library-read"))    
+    def get_user_id(self):
+        result = self.sp.current_user()
+        return result['id']
