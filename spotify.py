@@ -1,3 +1,4 @@
+from os import name
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from pprint import pprint
@@ -33,13 +34,15 @@ class Spotify:
     def create_list(self, song_list, date):
         
         uri_list = []
-        print("\nCollecting URIs....")
+        pprint("Collecting URIs....")
         for song in song_list:
             try:
                 result = self.sp.search(q=f"track: {song} year: {date.split('-')[0]}")
                 uri_list.append(result['tracks']['items'][0]['uri'])
             except:
-                pprint("Not able to find: "+ song)
+                pprint("Not able to find: "+ song.strip())
+            
+        pprint("Done collevting URIs")
         return uri_list
     
     
@@ -62,8 +65,19 @@ class Spotify:
                                                 "according to Billboard."
                                 )
             self.playlist_id = result['id']
+            pprint("Playlist created: " + playlist_name)
+            
         except:
             pprint("Not able to create playlist.")
             
-
+    
+    def add_songs_to_playlist(self, list_of_songs):
+        
+        try:
+            pprint("Adding songs..")
+            result = self.sp.playlist_add_items(self.playlist_id, list_of_songs)
+            pprint("Added all songs..")
+        except:
+            pprint("Not able to add songs.")
+            
         
