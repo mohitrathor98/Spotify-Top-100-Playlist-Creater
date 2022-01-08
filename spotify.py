@@ -1,4 +1,4 @@
-from os import name
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from pprint import pprint
@@ -71,12 +71,33 @@ class Spotify:
             pprint("Not able to create playlist.")
             
     
-    def add_songs_to_playlist(self, list_of_songs):
+    def get_current_song_in_playlist(self):
         
         try:
+            
+            result = self.sp.playlist_tracks(self.playlist_id)
+            if len(result['items']) > 0:
+                return [songs['track']['uri'] for songs in result['items']]
+            else:
+                return []
+        
+        except:
+            pprint("Unable to get songs in playlist.")
+    
+    def add_songs_to_playlist(self, list_of_songs):
+        
+        existing_songs = self.get_current_song_in_playlist()
+        
+        try:
+            # removing duplicates which are already present
+            for song in list_of_songs:
+                if song in existing_songs:
+                    list_of_songs.remove(song)
+            
             pprint("Adding songs..")
             result = self.sp.playlist_add_items(self.playlist_id, list_of_songs)
             pprint("Added all songs..")
+            
         except:
             pprint("Not able to add songs.")
             
