@@ -3,6 +3,7 @@ from spotipy.oauth2 import SpotifyOAuth
 from pprint import pprint
 
 class Spotify:
+    
     def __init__(self) -> None:
         self.client_id = "Spotify client id"
         self.client_secret = "Spotify client secret"
@@ -13,17 +14,24 @@ class Spotify:
         except Exception as e:
             raise e
         
+        self.playlist_id = None
+        
         
     def authenticate_user(self):
+        
         return spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=self.client_id,
                                                        client_secret=self.client_secret,
                                                        redirect_uri=self.redirect_uri,
-                                                       scope="playlist-modify-private"))    
+                                                       scope="playlist-modify-public"))
+            
     def get_user_id(self):
+        
         result = self.sp.current_user()
         return result['id']
     
+    
     def create_list(self, song_list, date):
+        
         uri_list = []
         print("\nCollecting URIs....")
         for song in song_list:
@@ -34,15 +42,28 @@ class Spotify:
                 pprint("Not able to find: "+ song)
         return uri_list
     
+    
     def create_playlist(self, date):
+        
+        playlist_name = f"{date} Billboard 100"
         try:
+            result = self.sp.user_playlists(self.user_id)
+            for list in result['items']:
+                if list['name'] == playlist_name:
+                    pprint("Playlist already exists")
+                    self.playlist_id = list['id']
+                    return
+                
             result = self.sp.user_playlist_create(
                                 user = self.user_id, 
-                                name = f"{date} Billboard 100", 
-                                public = False, 
+                                name = playlist_name, 
+                                public = True, 
                                 description = f"These are top 100 songs on {date} "+
                                                 "according to Billboard."
                                 )
-            pprint(result)
+            self.playlist_id = result['id']
         except:
             pprint("Not able to create playlist.")
+            
+
+        
